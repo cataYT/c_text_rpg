@@ -1,3 +1,5 @@
+/*! Main file */
+
 #include "headers/player.h"
 #include "headers/vector.h"
 #include "headers/game.h"
@@ -6,6 +8,13 @@
 #include <stdbool.h>
 #include <limits.h>
 
+/**
+ * @brief Used for getting user input.
+ * 
+ * @param[in] msg Message to display to user.
+ * @param[in] size Size of the user input.
+ * @param[out] buffer User allocated buffer to hold user input.
+ */
 void get_input(const char *msg, size_t size, char *buffer)
 {
     printf("%s", msg);
@@ -21,6 +30,13 @@ void get_input(const char *msg, size_t size, char *buffer)
     }
 }
 
+/**
+ * @brief Parse string to unsigned int.
+ * 
+ * @param[in] str String to convert to unsigned int.
+ * @param[out] out_val Pointer to unsigned int to store the value.
+ * @return true if successful, false otherwise.
+ */
 bool parse_int(const char *str, unsigned int *out_val)
 {
     if (!str || !out_val) return false;
@@ -35,6 +51,11 @@ bool parse_int(const char *str, unsigned int *out_val)
     return true;
 }
 
+/**
+ * @brief Main function.
+ * 
+ * @return 0 on success, 1 otherwise. 
+ */
 int main(void)
 {
     char p_name[100] = {'\0'};
@@ -54,30 +75,30 @@ int main(void)
     }
 
     struct weapon first_weapon = {0};
-    create_weapon(w_name, 100, w_dmg, &first_weapon);
+    weapon_initialize(w_name, 100, w_dmg, &first_weapon);
 
     struct vector player_weapons = {0};
-    create_vector(10, sizeof(struct weapon), &player_weapons);
+    vector_initialize(10, sizeof(struct weapon), &player_weapons);
     vector_push_back(&player_weapons, &first_weapon);
 
     struct armor basic_armor = {0};
-    create_armor("BASIC", 10, 100, 1, &basic_armor);
+    armor_initialize("BASIC", 10, 100, 1, &basic_armor);
 
     struct player cata = {0};
-    create_player(p_name, 100, &player_weapons, &basic_armor, &cata);
+    player_initialize(p_name, 100, &player_weapons, &basic_armor, &cata);
 
     struct weapon sword = {0};
-    create_weapon("Sword", 100, 10, &sword);
+    weapon_initialize("Sword", 100, 10, &sword);
 
     struct vector enemy_weapons = {0};
-    create_vector(10, sizeof(struct weapon), &enemy_weapons);
+    vector_initialize(10, sizeof(struct weapon), &enemy_weapons);
     vector_push_back(&enemy_weapons, &sword);
 
     struct player enemy = {0};
-    create_player("enemy", 50, &enemy_weapons, &basic_armor, &enemy);
+    player_initialize("enemy", 50, &enemy_weapons, &basic_armor, &enemy);
 
     struct game g = {0};
-    create_game(2, &g);
+    game_initialize(2, &g);
     game_insert_player(&cata, &g);
     game_insert_player(&enemy, &g);
 
@@ -101,14 +122,14 @@ int main(void)
         printf("No body won!\n");
     }
 
-    free_weapon(&first_weapon);
-    free_vector(&player_weapons);
-    free_armor(&basic_armor);
-    free_player(&cata);
-    free_player(&enemy);
-    free_weapon(&sword);
-    free_vector(&enemy_weapons);
-    free_game(&g);
+    weapon_deinitialize(&first_weapon);
+    vector_deinitialize(&player_weapons);
+    armor_deinitialize(&basic_armor);
+    player_deinitialize(&cata);
+    player_deinitialize(&enemy);
+    weapon_deinitialize(&sword);
+    vector_deinitialize(&enemy_weapons);
+    game_deinitialize(&g);
 
     return 0;
 }

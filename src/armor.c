@@ -1,3 +1,5 @@
+/*! Armor implementation file */
+
 #include "headers/armor.h"
 #include "headers/compatibility.h"
 #include <stdbool.h>
@@ -5,7 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 
-bool create_armor(const char *name, const unsigned int health, const unsigned int max_health, const unsigned int resistance_force, struct armor *a)
+bool armor_initialize(const char *name, const unsigned int health, const unsigned int max_health, const unsigned int resistance_force, struct armor *a)
 {
     if (!name || name[0] == '\0' || health == 0 || max_health == 0 || health > max_health || resistance_force == 0 || !a) {
         return false;
@@ -44,7 +46,7 @@ unsigned int armor_get_resistance(const struct armor *a)
 
 void armor_enhance_armor(const unsigned int new_resistance_force, struct armor *a)
 {
-    if (new_resistance_force == 0 || !a) {
+    if (new_resistance_force <= a->_armor_resistance_force || !a) {
         return;
     }
 
@@ -95,7 +97,9 @@ void armor_add_armor(const struct armor *a1, const struct armor *a2, struct armo
 
     size_t total_len = strlen(a1->armor_name) + 1 + strlen(a2->armor_name) + 1;
     added_armor->armor_name = malloc(total_len);
-    if (!added_armor->armor_name) return;
+    if (!added_armor->armor_name) {
+        return;
+    }
     strcpy_s(added_armor->armor_name, total_len, a1->armor_name);
     strcat_s(added_armor->armor_name, total_len, ":");
     strcat_s(added_armor->armor_name, total_len, a2->armor_name);
@@ -105,7 +109,7 @@ void armor_add_armor(const struct armor *a1, const struct armor *a2, struct armo
     added_armor->_armor_resistance_force = a1->_armor_resistance_force + a2->_armor_resistance_force;
 }
 
-void free_armor(struct armor *a)
+void armor_deinitialize(struct armor *a)
 {
     if (!a || !a->armor_name) {
         return;

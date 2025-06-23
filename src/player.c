@@ -1,3 +1,5 @@
+/*! Player implementation file */
+
 #include "headers/player.h"
 #include "third_party/pcg_basic.h"
 #include "headers/compatibility.h"
@@ -5,9 +7,10 @@
 #include <string.h>
 #include <stdio.h>
 
+/** Random state */
 pcg32_random_t pcg_state;
 
-bool create_player(const char *name, const unsigned int health, const struct vector *weapons, const struct armor *armor, struct player *p)
+bool player_initialize(const char *name, const unsigned int health, const struct vector *weapons, const struct armor *armor, struct player *p)
 {
     if (!name || name[0] == '\0' || health == 0 || !weapons || !armor || !p) {
         return false;
@@ -79,6 +82,13 @@ void player_update_weapons(const char *type, const struct weapon *w, struct play
     }
 }
 
+/**
+ * @brief Used to determine critical damage. Gets a random value from 1 to 4 and applying critical damage if the value is 1.
+ * 
+ * @param[in] weapon_damage Base weapon damage.
+ * @param[in] armor_resistance Armor resistance, used for decreasing the total damage.
+ * @return damage/resistance * 1.5 or damage/resistance.
+ */
 unsigned int crit(const unsigned int weapon_damage, const unsigned int armor_resistance)
 {
     if (weapon_damage == 0 || armor_resistance == 0) {
@@ -141,7 +151,7 @@ void player_add_player(const struct player *p1, const struct player *p2, struct 
 
     const size_t bigger_size = (p1->_weapons.size > p2->_weapons.size) ? p1->_weapons.size : p2->_weapons.size;
     struct vector new_weapons = {0};
-    create_vector(bigger_size * 2, sizeof(struct weapon), &new_weapons);
+    vector_initialize(bigger_size * 2, sizeof(struct weapon), &new_weapons);
 
     struct weapon temp_1 = {0};
     struct weapon temp_2 = {0};
@@ -161,7 +171,7 @@ void player_add_player(const struct player *p1, const struct player *p2, struct 
     add_player->_isWearingArmor = true;
 }
 
-void free_player(struct player *p)
+void player_deinitialize(struct player *p)
 {
     if (!p || !p->player_name) {
         return;

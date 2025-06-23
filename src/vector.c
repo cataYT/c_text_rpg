@@ -1,23 +1,25 @@
+/*! Vector implementation file */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "headers/vector.h"
+#include "vector.h"
 
-bool create_vector(const size_t capacity, const size_t e_size, struct vector *vec)
+bool vector_initialize(const size_t capacity, const size_t e_size, struct vector *vec)
 {
     if (capacity == 0) {
-        fprintf(stderr, "capacity is 0 at create_vector()\n");
+        fprintf(stderr, "capacity is 0 at vector_initialize()\n");
         return false;
     }
 
     if (e_size == 0) {
-        fprintf(stderr, "element size is 0 at create_vector()\n");
+        fprintf(stderr, "element size is 0 at vector_initialize()\n");
         return false;
     }
 
     vec->items = malloc(e_size * capacity);
     if (!vec->items) {
-        fprintf(stderr, "malloc failed at create_vector()\n");
+        fprintf(stderr, "malloc failed at vector_initialize()\n");
         return false;
     }
     vec->e_size = e_size;
@@ -29,7 +31,23 @@ bool create_vector(const size_t capacity, const size_t e_size, struct vector *ve
 
 bool vector_search_element(const struct vector *vec, const void *key, void *element, cmp_func cmp)
 {
-    if (!vec || !vec->items || !key || !cmp) {
+    if (!vec) {
+        fprintf(stderr, "vector is null at vector_search_element()\n");
+        return false;
+    }
+
+    if (!vec->items) {
+        fprintf(stderr, "vector is empty at vector_search_element()\n");
+        return false;
+    }
+
+    if (!key) {
+        fprintf(stderr, "key is null at vector_search_element()\n");
+        return false;
+    }
+
+    if (!cmp) {
+        fprintf(stderr, "comparision function is null at vector_search_element()\n");
         return false;
     }
 
@@ -49,17 +67,17 @@ bool vector_search_element(const struct vector *vec, const void *key, void *elem
 bool vector_get_element(const struct vector *vec, const size_t index, void *element)
 {
     if (!vec) {
-        fprintf(stderr, "vector is null at get_vector_element()\n");
+        fprintf(stderr, "vector is null at vector_get_element()\n");
         return false;
     }
 
     if (!element) {
-        fprintf(stderr, "element is null at get_vector_element()\n");
+        fprintf(stderr, "element is null at vector_get_element()\n");
         return false;
     }
 
     if (index >= vec->size) {
-        fprintf(stderr, "index is greater than vector size at get_vector_element()\n");
+        fprintf(stderr, "index is greater than vector size at vector_get_element()\n");
         return false;
     }
 
@@ -72,12 +90,12 @@ bool vector_get_element(const struct vector *vec, const size_t index, void *elem
 bool vector_push_back(struct vector *vec, const void *element)
 {
     if (!vec) {
-        fprintf(stderr, "vector is null at push_back()\n");
+        fprintf(stderr, "vector is null at vector_push_back()\n");
         return false;
     }
 
     if (!element) {
-        fprintf(stderr, "element is null at push_back()\n");
+        fprintf(stderr, "element is null at vector_push_back()\n");
         return false;
     }
 
@@ -87,7 +105,7 @@ bool vector_push_back(struct vector *vec, const void *element)
 
         void *new_block = realloc(vec->items, vec->capacity * vec->e_size);
         if (!new_block) {
-            fprintf(stderr, "realloc failed at push_back()\n");
+            fprintf(stderr, "realloc failed at vector_push_back()\n");
             return false;
         }
         vec->items = new_block;
@@ -113,12 +131,12 @@ copying from right (higher memory address) to left (lower memory address)
 bool vector_pop_search(struct vector *vec, const void *element)
 {
     if (!vec) {
-        fprintf(stderr, "vector is null at pop_search()\n");
+        fprintf(stderr, "vector is null at vector_pop_search()\n");
         return false;
     }
 
     if (!element) {
-        fprintf(stderr, "element is null at pop_search()\n");
+        fprintf(stderr, "element is null at vector_pop_search()\n");
         return false;
     }
 
@@ -147,17 +165,17 @@ bool vector_pop_search(struct vector *vec, const void *element)
 bool vector_pop_index(struct vector *vec, const size_t index, void *element)
 {
     if (!vec) {
-        fprintf(stderr, "vector is null at pop_index()\n");
+        fprintf(stderr, "vector is null at vector_pop_index()\n");
         return false;
     }
 
     if (!element) {
-        fprintf(stderr, "element is null at pop_index()\n");
+        fprintf(stderr, "element is null at vector_pop_index()\n");
         return false;
     }
 
     if (index >= vec->size) {
-        fprintf(stderr, "index is out of bounds at pop_index()\n");
+        fprintf(stderr, "index is out of bounds at vector_pop_index()\n");
         return false;
     }
 
@@ -175,7 +193,7 @@ bool vector_pop_index(struct vector *vec, const size_t index, void *element)
     return true;
 }
 
-void free_vector(struct vector *vec)
+void vector_deinitialize(struct vector *vec)
 {
     if (!vec) {
         return;
@@ -186,5 +204,4 @@ void free_vector(struct vector *vec)
     vec->e_size = 0;
     vec->size = 0;
     vec->capacity = 0;
-    memset(vec, 0, sizeof(*vec));
 }

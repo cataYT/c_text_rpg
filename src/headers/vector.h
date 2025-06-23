@@ -1,10 +1,19 @@
+/*! Vector declaration file */
+
 #pragma once
 
 #include <stdlib.h>
 #include <stdbool.h>
 
-/// Comparison function for searching elements.
-/// Should return `true` if the element matches the key.
+/**
+ * @typedef cmp_func
+ * @brief Comparision function used by vector_search_element().
+ * 
+ * @param[in] element Element to compare to.
+ * @param[in] key Key of the element.
+ * 
+ * @return true if comparison succeeded, false otherwise.
+ */
 typedef bool (*cmp_func)(const void *element, const void *key);
 
 /**
@@ -15,10 +24,14 @@ typedef bool (*cmp_func)(const void *element, const void *key);
  * retrieval, search, and deletion.
  */
 struct vector {
-    void *items;       ///< Pointer to the contiguous memory block for elements.
-    size_t e_size;     ///< Size of each element in bytes.
-    size_t size;       ///< Current number of elements in the vector.
-    size_t capacity;   ///< Allocated capacity in elements.
+    /** Pointer to the contiguous memory block for elements. */
+    void *items;
+    /** Size of each element in bytes. */
+    size_t e_size;
+    /** Current number of elements in the vector. */
+    size_t size;
+    /** Allocated capacity in elements. */
+    size_t capacity;
 };
 
 /**
@@ -33,7 +46,7 @@ struct vector {
  *
  * @return `true` on success, `false` on allocation failure or invalid arguments.
  */
-bool create_vector(const size_t capacity, const size_t e_size, struct vector *vec);
+bool vector_initialize(const size_t capacity, const size_t e_size, struct vector *vec);
 
 /**
  * @brief Searches for an element in the vector using a comparison function.
@@ -109,4 +122,4 @@ bool vector_pop_index(struct vector *vec, const size_t index, void *element);
  *
  * @param[in,out] vec  Pointer to the vector to clean up.
  */
-void free_vector(struct vector *vec);
+void vector_deinitialize(struct vector *vec);

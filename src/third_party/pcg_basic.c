@@ -30,21 +30,22 @@
 
 #include "pcg_basic.h"
 
-// state for global RNGs
-
+/// state for global RNGs
 static pcg32_random_t pcg32_global = PCG32_INITIALIZER;
 
-// pcg32_srandom(initstate, initseq)
-// pcg32_srandom_r(rng, initstate, initseq):
-//     Seed the rng.  Specified in two parts, state initializer and a
-//     sequence selection constant (a.k.a. stream id)
-
+/// Seed the rng.  Specified in two parts, state initializer and a sequence selection constant (a.k.a. stream id)
 void pcg32_srandom_r(pcg32_random_t* rng, uint64_t initstate, uint64_t initseq)
 {
+    // Start with a known, fixed state (zero) before applying the seed.
+    // Important to ensure deterministic behaviour when seeding.
     rng->state = 0U;
+    // Multiplies sequence by 2 and OR it to ensure its odd
     rng->inc = (initseq << 1u) | 1u;
+    // Advance the generator
     pcg32_random_r(rng);
+    // Add user seed
     rng->state += initstate;
+    // Advance again
     pcg32_random_r(rng);
 }
 
@@ -53,16 +54,18 @@ void pcg32_srandom(uint64_t seed, uint64_t seq)
     pcg32_srandom_r(&pcg32_global, seed, seq);
 }
 
-// pcg32_random()
-// pcg32_random_r(rng)
-//     Generate a uniformly distributed 32-bit random number
-
+/// Generate a uniformly distributed 32-bit random number
 uint32_t pcg32_random_r(pcg32_random_t* rng)
 {
+    // Need old state to generate output.
     uint64_t oldstate = rng->state;
+    // Standard LCG formula, magic value is carefully chosen to ensure randomness.
     rng->state = oldstate * 6364136223846793005ULL + rng->inc;
+    // Mix the bits of old state, reduces the 64-bit state down to 32 bits with good distribution.
     uint32_t xorshifted = (uint32_t)((oldstate >> 18u) ^ oldstate) >> 27u;
+    // Take the top 5 bits of oldstate to determine how much to rotate, gives value between 0 and 31.
     uint32_t rot = oldstate >> 59u;
+    // bitwise rotate right, ensures full use of entropy and rotation amount varies dynamically, adding more randomness to the output.
     return (xorshifted >> rot) | (xorshifted << ((32 - rot) & 31));
 }
 
@@ -70,11 +73,6 @@ uint32_t pcg32_random(void)
 {
     return pcg32_random_r(&pcg32_global);
 }
-
-
-// pcg32_boundedrand(bound):
-// pcg32_boundedrand_r(rng, bound):
-//     Generate a uniformly distributed number, r, where 0 <= r < bound
 
 uint32_t pcg32_boundedrand_r(pcg32_random_t* rng, uint32_t bound)
 {
@@ -103,11 +101,11 @@ uint32_t pcg32_boundedrand_r(pcg32_random_t* rng, uint32_t bound)
     // is eliminated.
     for (;;) {
         uint32_t r = pcg32_random_r(rng);
-        if (r >= threshold)
+        if (r >= threshold) {
             return r % bound;
+        }
     }
 }
-
 
 uint32_t pcg32_boundedrand(uint32_t bound)
 {

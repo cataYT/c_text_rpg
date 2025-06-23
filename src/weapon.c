@@ -1,10 +1,12 @@
+/*! Weapon implementation file */
+
 #include "headers/weapon.h"
 #include "headers/compatibility.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
-bool create_weapon(const char *name, const unsigned int health, const unsigned int damage, struct weapon *w)
+bool weapon_initialize(const char *name, const unsigned int health, const unsigned int damage, struct weapon *w)
 {
     if (!name || name[0] == '\0' || health == 0 || damage == 0 || !w) {
         return false;
@@ -102,7 +104,7 @@ bool weapon_is_equal(const struct weapon *w1, const struct weapon *w2)
     w1->weapon_damage == w2->weapon_damage;
 }
 
-void free_weapon(struct weapon *w)
+void weapon_deinitialize(struct weapon *w)
 {
     if (!w || !w->weapon_name) {
         return;

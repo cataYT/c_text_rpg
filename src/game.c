@@ -1,18 +1,21 @@
+/*! Game implementation file */
+
 #include "headers/game.h"
 #include "headers/vector.h"
 #include "headers/player.h"
 #include <stdlib.h>
 #include <string.h>
 
+/** Global player vector */
 static struct vector players = {0};
 
-bool create_game(const unsigned int initial_capacity, struct game *g)
+bool game_initialize(const unsigned int initial_capacity, struct game *g)
 {
     if (!g) {
         return false;
     }
 
-    create_vector(initial_capacity, sizeof(struct player), &players);
+    vector_initialize(initial_capacity, sizeof(struct player), &players);
 
     g->players = players;
     return false;
@@ -58,12 +61,12 @@ size_t game_get_total_players(const struct game *g)
     return g->players.size;
 }
 
-void free_game(struct game *g)
+void game_deinitialize(struct game *g)
 {
     if (!g || !g->players.items) {
         return;
     }
 
-    free_vector(&g->players);
+    vector_deinitialize(&g->players);
     memset(g, 0, sizeof(*g));
 }
